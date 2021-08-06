@@ -1,9 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Container.h"
 
-// Sets default values
 AContainer::AContainer()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -19,6 +15,17 @@ AContainer::AContainer(int size)
 		hasEmptySlot = true;
 	}
 
+}
+
+AContainer::AContainer(AContainer& other)
+{
+	maxSize = other.maxSize;
+	Items.Reserve(maxSize);
+	for (int i = 0; i < maxSize; ++i)
+	{
+		Items[i] = other.Items[i];
+	}
+	hasEmptySlot = other.hasEmptySlot;
 }
 
 bool AContainer::GetIsSlotEmpty(int index) const
@@ -42,7 +49,7 @@ int AContainer::FindEmptyIndex() const
 	return -1;
 }
 
-bool AContainer::FindItem(const AItem& const item) const
+bool AContainer::FindItem(AItem& item) const
 {
 	for (int i = 0; i < maxSize; ++i)
 	{
@@ -57,7 +64,7 @@ bool AContainer::FindItem(const AItem& const item) const
 	return false;
 }
 
-bool AContainer::FindItem_AfterIndex(const AItem& const item, int const index) const
+bool AContainer::FindItem_AfterIndex(AItem& item, int index) const
 {
 	for (int i = index + 1; i < maxSize; ++i)
 	{
@@ -72,7 +79,7 @@ bool AContainer::FindItem_AfterIndex(const AItem& const item, int const index) c
 	return false;
 }
 
-int AContainer::FindItem_GetIndex(const AItem& const item) const
+int AContainer::FindItem_GetIndex(AItem& item) const
 {
 	for (int i = 0; i < maxSize; ++i)
 	{
@@ -86,16 +93,23 @@ int AContainer::FindItem_GetIndex(const AItem& const item) const
 
 bool AContainer::AddItem(AItem& item)
 {
-	int i = FindItem_GetIndex(item);
-	if (i >= 0)
+	//if the item can be stacked
+	if (item.maxStack > 1)
 	{
+		int i = FindItem_GetIndex(item);
 
+		//find if the same item is in the container first
+		//then add to it if can be
+		if (i >= 0)
+		{
+			Items[i]->GetQuantity();
+		}
 	}
+	//add new one if there's a spot
 	if (hasEmptySlot)
 	{
-
+		AddItemAt(item, FindEmptyIndex());
 	}
-
 	return false;
 }
 
@@ -105,9 +119,29 @@ bool AContainer::AddItemAt(AItem& item, int index)
 	{
 		if (Items[index] == nullptr)
 		{
-			Items.EmplaceAt(index, item);
+			Items.EmplaceAt(index, &item);
+			return true;
+		}
+		else if (item.GetID() == Items[index]->itemID)
+		{
+			int AddQuantity = item.GetQuantity();
+			int ItemQuantity = Items[index]->GetQuantity();
+			int MaxStack = Items[index]->GetMaxStack();
+			if ((ItemQuantity + AddQuantity) <= MaxStack)
+			{
+				Items[index]->SetQuantity(ItemQuantity + AddQuantity);
+				item.SetQuantity(0);
+				return true;
+			}
+			else
+			{
+				Items[index]->SetQuantity(MaxStack);
+				item.SetQuantity(AddQuantity - ItemQuantity);
+				return true;
+			}
 		}
 	}
+	UpdateHasEmptySlot();
 	return false;
 }
 
@@ -138,53 +172,66 @@ bool AContainer::TransferAllItems(AContainer& toOther)
 	return false;
 }
 
-AItem& AContainer::GetItem(const AItem item)
+AItem* AContainer::GetItem(AItem item)
 {
 	int i = FindItem_GetIndex(item);
 	if (i >= 0)
 	{
-		return *Items[i];
+		return Items[i];
 	}
-	return AItem();
+	return nullptr;
 }
 
-AItem& AContainer::GetItemAt(const int index)
+AItem* AContainer::GetItemAt(int index)
 {
 	if (index >= 0 && index < maxSize)
 	{
 		if (Items[index] != nullptr)
 		{
-			return *Items[index];
+			return Items[index];
 		}
 	}
-	return AItem();
+	return nullptr;
+}
+
+TArray<AItem*> AContainer::GetAllItems()
+{
+	return TArray<AItem*>();
 }
 
 bool AContainer::RemoveItems(AItem& item)
 {
 	int i = FindItem_GetIndex(item);
-
-	while ((i >= 0 && i < maxSize) && item.Quantity > 0)
+	int q = item.GetQuantity();
+	while ((i >= 0 && i < maxSize) && q > 0)
 	{
-		if (Items[i]->Quantity > item.Quantity)
+		int p = Items[i]->GetQuantity();
+		if (p > q)
 		{
-			Items[i]->Quantity - item.Quantity;
-			item.Quantity = 0;
+			Items[i]->SetQuantity(p - q);
+			q = 0;
+			item.SetQuantity(0);
 		}
-		else if (Items[i]->Quantity == item.Quantity)
+		else if (p == q)
 		{
-			Items[i]->Quantity - item.Quantity;
+			Items[i]->SetQuantity(0);
 			Items[i] = nullptr;
-			item.Quantity = 0;
+			
+			item.SetQuantity(0);
 			hasEmptySlot = true;
 		}
 		else
 		{
-			item.Quantity - Items[i]->Quantity;
+			Items[i]->SetQuantity(0);
 			Items[i] = nullptr;
-			FindItem_AfterIndex(item, i);
+			q = q - p;
+
+			item.SetQuantity(q);
 			hasEmptySlot = true;
+
+			i = FindItem_AfterIndex(item, i);
 		}
+		
 	}
 	if (item.Quantity == 0)
 	{
@@ -199,7 +246,8 @@ bool AContainer::RemoveItemAt(int index)
 	{
 		if (Items[index] != nullptr)
 		{
-			Items[index] == nullptr;
+			Items[index] = nullptr;
+			hasEmptySlot = true;
 		}
 	}
 	return false;
@@ -207,6 +255,7 @@ bool AContainer::RemoveItemAt(int index)
 
 void AContainer::RemoveAllItems()
 {
+	hasEmptySlot = true;
 	Items.Empty(maxSize);
 }
 

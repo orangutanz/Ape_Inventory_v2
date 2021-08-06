@@ -20,6 +20,7 @@ private:
 public:
 	AContainer();
 	AContainer(int size);
+	AContainer(AContainer& other);
 
 	// Get empty slot
 	bool GetHasEmptySlot() const { return hasEmptySlot; }
@@ -27,10 +28,10 @@ public:
 	int FindEmptyIndex() const; // return index, retrun -1 if not found;	
 
 	// Find item
-	TArray<AItem*>& Find_ItemsOfType(const AItem& const item);
-	bool FindItem(const AItem& const item) const;
-	bool FindItem_AfterIndex(const AItem& const item, int const index) const;
-	int FindItem_GetIndex(const AItem& const item) const; // return index, retrun -1 if not found;
+	// TArray<AItem*>& Find_ItemsOfType(const AItem& const item);
+	bool FindItem(AItem& item) const;
+	bool FindItem_AfterIndex(AItem& item, int index) const;
+	int FindItem_GetIndex(AItem& item) const; // return index, retrun -1 if not found;
 
 	// Add item
 	bool AddItem(AItem& item);
@@ -42,12 +43,13 @@ public:
 
 	// Transfer item
 	bool TransferItem(AItem item, AContainer& toOther);
-	bool TransferItemAt(int const index, AContainer& toOther);
+	bool TransferItemAt(int index, AContainer& toOther);
 	bool TransferAllItems(AContainer& toOther);
 
 	// Get item
-	AItem& GetItem(const AItem item);
-	AItem& GetItemAt(const int index);
+	AItem* GetItem(AItem item);
+	AItem* GetItemAt(int index);
+	TArray<AItem*> GetAllItems();
 
 	// Remove item
 	bool RemoveItems(AItem& item); // RemoveItems(Apple);
@@ -55,6 +57,9 @@ public:
 	void RemoveAllItems();
 
 	~AContainer();
+
+	void UpdateHasEmptySlot();
+	void UpdateEmptyItems();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

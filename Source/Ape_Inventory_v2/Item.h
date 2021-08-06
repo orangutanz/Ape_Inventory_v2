@@ -59,3 +59,21 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 };
+
+
+USTRUCT(BlueprintType)
+struct FItemInfo
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		FName ItemID;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		FText Description;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int Value;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		UTexture2D* Icon;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		UStaticMesh* mesh;
+};

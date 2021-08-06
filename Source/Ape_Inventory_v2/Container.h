@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Item.h"
 #include "GameFramework/Actor.h"
 #include "Container.generated.h"
 
@@ -10,11 +11,50 @@ UCLASS()
 class APE_INVENTORY_V2_API AContainer : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	AContainer();
 
+private:
+	int maxSize = 0;
+	bool hasEmptySlot = false;
+	TArray<AItem*> Items;
+
+public:
+	AContainer();
+	AContainer(int size);
+
+	// Get empty slot
+	bool GetHasEmptySlot() const { return hasEmptySlot; }
+	bool GetIsSlotEmpty(int index) const;
+	int FindEmptyIndex() const; // return index, retrun -1 if not found;	
+
+	// Find item
+	TArray<AItem*>& Find_ItemsOfType(const AItem& const item);
+	bool FindItem(const AItem& const item) const;
+	bool FindItem_AfterIndex(const AItem& const item, int const index) const;
+	int FindItem_GetIndex(const AItem& const item) const; // return index, retrun -1 if not found;
+
+	// Add item
+	bool AddItem(AItem& item);
+	bool AddItemAt(AItem& item, int index);
+
+	// Swap item
+	void SwapItem(int first, int second);
+	void SwapItemContainer(AContainer& other, int first, int second);
+
+	// Transfer item
+	bool TransferItem(AItem item, AContainer& toOther);
+	bool TransferItemAt(int const index, AContainer& toOther);
+	bool TransferAllItems(AContainer& toOther);
+
+	// Get item
+	AItem& GetItem(const AItem item);
+	AItem& GetItemAt(const int index);
+
+	// Remove item
+	bool RemoveItems(AItem& item); // RemoveItems(Apple);
+	bool RemoveItemAt(int index);
+	void RemoveAllItems();
+
+	~AContainer();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

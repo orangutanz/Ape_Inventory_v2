@@ -41,7 +41,7 @@ public:
 	void SwapItem(int first, int second);
 
 	// Transfer item
-	bool TransferItem(AItem item, AContainer& toOther);
+	//bool TransferItem(AItem item, AContainer& toOther);
 	bool TransferItemAt(int index, AContainer& toOther);
 	bool TransferAllItems(AContainer& toOther);
 

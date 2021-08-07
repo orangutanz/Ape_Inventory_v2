@@ -171,12 +171,11 @@ void AContainer::SwapItem(int first, int second)
 		Items.Swap(first, second);
 	}
 }
-
+/*
 bool AContainer::TransferItem(AItem item, AContainer& toOther)
 {
-
 	return false;
-}
+}*/
 
 bool AContainer::TransferItemAt(int index, AContainer& toOther)
 {
@@ -201,7 +200,23 @@ bool AContainer::TransferItemAt(int index, AContainer& toOther)
 
 bool AContainer::TransferAllItems(AContainer& toOther)
 {
-	return false;
+	for (int i = 0; i < maxSize; ++i)
+	{
+		if (Items[i] != nullptr)
+		{
+			toOther.AddItem(*Items[i]);
+		}
+	}
+	UpdateEmptyItems();
+	UpdateHasEmptySlot();
+	for (int i = 0; i < maxSize; ++i)
+	{
+		if (Items[i] != nullptr)
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 AItem* AContainer::GetItem(AItem item)

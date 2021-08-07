@@ -34,25 +34,30 @@ AItem::~AItem()
 /*
 AItem& AItem::operator=(const AItem& other)
 {
-	itemID = other.GetID();
-	itemType = other.GetType();
-	Name = other.GetName();
-	Description = other.GetDescription();
-	maxStack = other.GetMaxStack();
-	Quantity = other.GetQuantity();
+	if (other != this)
+	{
+		itemID = other.GetID();
+		itemType = other.GetType();
+		Name = other.GetName();
+		Description = other.GetDescription();
+		maxStack = other.GetMaxStack();
+		Quantity = other.GetQuantity();
+	}
 	return *this;
 }
 
 AItem& AItem::operator=(AItem&& other)
 {
-	itemID = other.GetID();
-	itemType = other.GetType();
-	Name = other.GetName();
-	Description = other.GetDescription();
-	maxStack = other.GetMaxStack();
-	Quantity = other.GetQuantity();
+	
+	itemID = std::move(other.GetID());
+	itemType = std::move(other.GetType());
+	Name = std::move(other.GetName());
+	Description = std::move(other.GetDescription());
+	maxStack = std::move(other.GetMaxStack());
+	Quantity = std::move(other.GetQuantity());
 	other.Quantity = 0;
 	other = nullptr;
+	
 	return *this;
 }
 

@@ -35,10 +35,11 @@ public:
 	AItem(AItem* other);
 	~AItem();
 
-	//AItem& operator=(const AItem& other); // copy assignment
-	//AItem& operator=(AItem&& other);// move assignment
-	//AItem& operator+(AItem& other); // add up (possiblely move assignment)
-
+	/*
+	AItem& operator=(const AItem& other) = delete; // copy assignment
+	AItem& operator=(AItem&& other) = delete;// move assignment
+	AItem& operator+(AItem& other) = delete; // add up (possiblely move assignment)
+	*/
 	void SetID(const FName id) { itemID = id; }
 	void SetName(const FString name) { Name = name; }
 	void SetType(const ItemType type) { itemType = type; }

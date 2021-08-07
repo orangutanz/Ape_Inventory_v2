@@ -39,7 +39,6 @@ public:
 
 	// Swap item
 	void SwapItem(int first, int second);
-	void SwapItemContainer(AContainer& other, int first, int second);
 
 	// Transfer item
 	bool TransferItem(AItem item, AContainer& toOther);

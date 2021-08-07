@@ -97,19 +97,38 @@ bool AContainer::AddItem(AItem& item)
 	if (item.maxStack > 1)
 	{
 		int i = FindItem_GetIndex(item);
-
-		//find if the same item is in the container first
-		//then add to it if can be
-		if (i >= 0)
+		//find if the same item is in the container
+		while ((i >= 0 && i < maxSize) && item.GetQuantity() > 0)
 		{
-			Items[i]->GetQuantity();
+			int p = Items[i]->GetQuantity();
+			int q = item.GetQuantity();
+			int m = Items[i]->GetMaxStack();
+			if ((p + q) <= m)
+			{
+				Items[i]->SetQuantity(p + q);
+				item.SetQuantity(0);
+				return true;
+			}
+			else
+			{
+				Items[i]->SetQuantity(m);
+				item.SetQuantity(q - (m - p));
+			}
+			i = FindItem_AfterIndex(item, i);
 		}
 	}
 	//add new one if there's a spot
-	if (hasEmptySlot)
+	if (hasEmptySlot && item.GetQuantity() > 0)
 	{
 		AddItemAt(item, FindEmptyIndex());
+		item.SetQuantity(0);
 	}
+	//return true if all items are added
+	if (item.GetQuantity() == 0)
+	{
+		return true;
+	}
+	//false if there are items left not added
 	return false;
 }
 
@@ -153,17 +172,30 @@ void AContainer::SwapItem(int first, int second)
 	}
 }
 
-void AContainer::SwapItemContainer(AContainer& other, int first, int second)
-{
-}
-
 bool AContainer::TransferItem(AItem item, AContainer& toOther)
 {
+
 	return false;
 }
 
 bool AContainer::TransferItemAt(int index, AContainer& toOther)
 {
+	if (index >= 0 && index < maxSize)
+	{
+		if (Items[index] == nullptr)
+		{
+			return false;
+		}
+		else
+		{
+			bool result = toOther.AddItem(*Items[index]);
+			if (result)
+			{
+				Items[index] = nullptr;
+			}
+			return result;
+		}
+	}
 	return false;
 }
 

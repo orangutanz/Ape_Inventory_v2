@@ -35,6 +35,10 @@ public:
 	AItem(AItem* other);
 	~AItem();
 
+	//AItem& operator=(const AItem& other); // copy assignment
+	//AItem& operator=(AItem&& other);// move assignment
+	//AItem& operator+(AItem& other); // add up (possiblely move assignment)
+
 	void SetID(const FName id) { itemID = id; }
 	void SetName(const FString name) { Name = name; }
 	void SetType(const ItemType type) { itemType = type; }
@@ -60,7 +64,7 @@ public:
 
 };
 
-
+//define what ItemInfo should hold in the database
 USTRUCT(BlueprintType)
 struct FItemInfo
 {
@@ -71,7 +75,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		FText Description;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		int Value;
+		int MaxStack;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int Quantity;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UTexture2D* Icon;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
